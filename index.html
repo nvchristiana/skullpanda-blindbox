@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blind Box Hunter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1c1530;--ink2:#2a1f3d;--bone:#f6efe2;--blush:#f2a7c3;--mint:#9fe3cf;--gold:#f4c95d}
+*{box-sizing:border-box;margin:0}
+body{background:var(--ink);color:var(--bone);font-family:'DM Sans',system-ui,sans-serif;min-height:100vh;padding:28px 16px 60px;background-image:radial-gradient(circle at 20% 0%,#3a2a63 0,transparent 45%),radial-gradient(circle at 90% 100%,#4a2350 0,transparent 40%)}
+main{max-width:860px;margin:0 auto}
+h1{font-family:'Bagel Fat One','Arial Black',sans-serif;font-weight:400;font-size:clamp(2.4rem,8vw,4.2rem);line-height:1;color:var(--blush);letter-spacing:.5px}
+.sub{margin:10px 0 22px;font-size:1.05rem;opacity:.85}
+.stats{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:26px}
+.stat{background:var(--ink2);border:2px solid #4b3a72;border-radius:14px;padding:8px 14px;font-size:.95rem}
+.stat b{color:var(--gold);font-size:1.15rem}
+.pity{flex:1;min-width:200px}
+.bar{height:8px;background:#120d22;border-radius:6px;margin-top:6px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--mint),var(--gold));transition:width .4s}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.box{aspect-ratio:1;border:0;border-radius:18px;cursor:pointer;position:relative;background:linear-gradient(145deg,#ff9fc4,#b987ff);box-shadow:0 8px 0 #5d3a8f;transition:transform .15s,box-shadow .15s,opacity .3s;color:#fff;font-family:'Bagel Fat One',sans-serif;font-size:clamp(2rem,9vw,3.4rem)}
+.box:nth-child(2n){background:linear-gradient(145deg,#9fe3cf,#6aa8ff);box-shadow:0 8px 0 #2f5f9a}
+.box:nth-child(3n){background:linear-gradient(145deg,#ffd37a,#ff8fab);box-shadow:0 8px 0 #a04a6a}
+.box::before{content:"";position:absolute;left:44%;width:12%;top:0;bottom:0;background:rgba(255,255,255,.55)}
+.box::after{content:"";position:absolute;top:44%;height:12%;left:0;right:0;background:rgba(255,255,255,.55)}
+.box span{position:relative;z-index:1;text-shadow:0 3px 0 rgba(0,0,0,.25)}
+.box:hover:not(:disabled){transform:translateY(-4px)}
+.box:active:not(:disabled){transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.3)}
+.box:focus-visible,.btn:focus-visible{outline:4px solid var(--gold);outline-offset:3px}
+.box.shake{animation:shake .7s}
+.box.dim{opacity:.25}
+@keyframes shake{0%,100%{transform:rotate(0)}15%{transform:rotate(-9deg) translateY(-6px)}30%{transform:rotate(9deg)}45%{transform:rotate(-8deg) translateY(-6px)}60%{transform:rotate(8deg)}80%{transform:rotate(-4deg)}}
+.reveal{display:none;text-align:center;padding:10px 0 4px}
+.reveal.on{display:block}
+.card{width:min(300px,80vw);margin:0 auto;border-radius:26px;padding:18px 18px 16px;border:4px solid var(--ink2);color:var(--ink);animation:pop .5s cubic-bezier(.2,1.6,.4,1)}
+.card svg{width:100%;display:block}
+.card h2{font-family:'Bagel Fat One',sans-serif;font-weight:400;font-size:1.7rem;margin-top:6px}
+.tag{display:inline-block;margin-top:6px;padding:3px 14px;border-radius:20px;font-weight:600;background:var(--ink2);color:var(--bone)}
+.tag.rare{background:#3a6fe0}
+.tag.secret{background:linear-gradient(90deg,#ff5fa2,#f4c95d);color:var(--ink)}
+.card.secret{box-shadow:0 0 0 4px var(--gold),0 0 40px 10px rgba(244,201,93,.7);animation:pop .5s cubic-bezier(.2,1.6,.4,1),glow 1.6s infinite alternate}
+@keyframes pop{from{transform:scale(.3) rotate(-12deg);opacity:0}to{transform:none;opacity:1}}
+@keyframes glow{to{box-shadow:0 0 0 4px #fff3b0,0 0 60px 18px rgba(255,120,190,.7)}}
+.new{display:block;margin-top:14px;font-weight:600;color:var(--mint)}
+.btn{margin-top:18px;background:var(--gold);color:var(--ink);border:0;border-radius:14px;padding:12px 26px;font:600 1.05rem 'DM Sans',sans-serif;cursor:pointer;box-shadow:0 5px 0 #a88420}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 0 #a88420}
+.btn.ghost{background:transparent;color:var(--bone);box-shadow:none;border:2px solid #4b3a72;padding:8px 16px;font-size:.9rem;margin-top:0}
+h3{font-family:'Bagel Fat One',sans-serif;font-weight:400;font-size:1.8rem;margin:46px 0 14px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.coll{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.item{border-radius:16px;padding:8px 8px 10px;text-align:center;font-size:.8rem;font-weight:600;color:var(--ink);border:3px solid var(--ink2)}
+.item.locked{background:#251c3d;color:#7d6aa6;border:3px dashed #4b3a72}
+.item.locked svg{filter:brightness(0) opacity(.35)}
+.item svg{width:100%;display:block}
+.item.secret{border-color:var(--gold)}
+@media(max-width:560px){.coll{grid-template-columns:repeat(3,1fr)}.grid{gap:10px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+  <h1>Blind Box Hunter</h1>
+  <p class="sub">Pick a box and see which dark-and-dreamy panda is inside.</p>
+  <div class="stats">
+    <div class="stat">Boxes opened: <b id="opens">0</b></div>
+    <div class="stat">Collected: <b id="have">0</b>/12</div>
+    <div class="stat pity">Secret guaranteed in <b id="left">10</b> opens<div class="bar"><i id="pbar"></i></div></div>
+  </div>
+  <section id="pick" aria-label="Choose a box">
+    <div class="grid" id="grid"></div>
+  </section>
+  <section class="reveal" id="reveal" aria-live="polite">
+    <div id="cardwrap"></div>
+    <button class="btn" id="again">Open another box</button>
+  </section>
+  <h3>My collection <button class="btn ghost" id="reset">Reset progress</button></h3>
+  <div class="coll" id="coll"></div>
+</main>
+<script>
+const F=[
+{n:"Mochi Bone",r:"common",bg:"#f2a7c3",a:[["bow","#7a5cff"]],e:"#7a5cff"},
+{n:"Pip Grave",r:"common",bg:"#9fe3cf",a:[["flower","#f2a7c3"]],e:"#2a1f3d"},
+{n:"Sleepy Ash",r:"common",bg:"#c9b8ff",a:[["tear","#7ab8ff"]],e:"#2a1f3d"},
+{n:"Nib Nox",r:"common",bg:"#ffd6a5",a:[["hat","#3b2a5c"]],e:"#ff6b6b"},
+{n:"Dot Dusk",r:"common",bg:"#a8d8ff",a:[["stars","#f4c95d"]],e:"#2a1f3d"},
+{n:"Clover Crypt",r:"common",bg:"#bfe8a8",a:[["flower","#ff8fab"]],e:"#2f8f5f"},
+{n:"Paper Phantom",r:"common",bg:"#f7e1a0",a:[["bow","#ff6b6b"]],e:"#2a1f3d"},
+{n:"Velvet Horn",r:"rare",bg:"#ff8fab",a:[["horns","#3b2a5c"]],e:"#f4c95d"},
+{n:"Lunar Lull",r:"rare",bg:"#7a6bd8",a:[["halo","#f4c95d"]],e:"#7a6bd8"},
+{n:"Rosette Reign",r:"rare",bg:"#8a5ab0",a:[["crown","#f4c95d"],["tear","#ff8fab"]],e:"#ff8fab"},
+{n:"Eclipse Empress",r:"secret",bg:"#2b2150",a:[["crown","#f4c95d"],["stars","#fff3b0"]],e:"#f4c95d"},
+{n:"Cosmic Cradle",r:"secret",bg:"#4a1f6e",a:[["halo","#fff3b0"],["stars","#ff9fe0"],["horns","#f4c95d"]],e:"#9fe3cf"}
+];
+const ACC={
+bow:c=>`<path d="M50 20L32 10V28Z M50 20L68 10V28Z" fill="${c}" stroke="#2a1f3d" stroke-width="2.5" stroke-linejoin="round"/><circle cx="50" cy="20" r="4.5" fill="${c}" stroke="#2a1f3d" stroke-width="2.5"/>`,
+flower:c=>`<g transform="translate(74 20)" fill="${c}" stroke="#2a1f3d" stroke-width="2"><circle cx="0" cy="-6" r="5"/><circle cx="6" cy="0" r="5"/><circle cx="0" cy="6" r="5"/><circle cx="-6" cy="0" r="5"/><circle r="4" fill="#f4c95d"/></g>`,
+tear:c=>`<path d="M37 64Q33 72 37 75Q41 72 37 64Z" fill="${c}" stroke="#2a1f3d" stroke-width="1.5"/>`,
+hat:c=>`<path d="M30 28L50 0L70 28Z" fill="${c}" stroke="#2a1f3d" stroke-width="2.5" stroke-linejoin="round"/><path d="M24 29H76" stroke="#2a1f3d" stroke-width="5" stroke-linecap="round"/>`,
+stars:c=>`<g fill="${c}" stroke="#2a1f3d" stroke-width="1.5" font-size="14" text-anchor="middle"><text x="14" y="52">✦</text><text x="88" y="46">✦</text><text x="84" y="84">✦</text></g>`,
+horns:c=>`<path d="M30 28Q16 6 34 8Z M70 28Q84 6 66 8Z" fill="${c}" stroke="#2a1f3d" stroke-width="2.5" stroke-linejoin="round"/>`,
+halo:c=>`<ellipse cx="50" cy="8" rx="20" ry="5" fill="none" stroke="${c}" stroke-width="4"/>`,
+crown:c=>`<path d="M30 28L34 10L43 20L50 6L57 20L66 10L70 28Z" fill="${c}" stroke="#2a1f3d" stroke-width="2.5" stroke-linejoin="round"/>`
+};
+function fig(f){
+  const acc=f.a.map(x=>ACC[x[0]](x[1])).join("");
+  return `<svg viewBox="0 0 100 100" role="img" aria-label="${f.n}"><circle cx="24" cy="30" r="13" fill="#2a1f3d"/><circle cx="76" cy="30" r="13" fill="#2a1f3d"/><circle cx="50" cy="56" r="36" fill="#fbf7ee" stroke="#2a1f3d" stroke-width="3"/><ellipse cx="36" cy="52" rx="10" ry="12" fill="#2a1f3d" transform="rotate(-14 36 52)"/><ellipse cx="64" cy="52" rx="10" ry="12" fill="#2a1f3d" transform="rotate(14 64 52)"/><circle cx="36" cy="52" r="4.5" fill="${f.e}"/><circle cx="64" cy="52" r="4.5" fill="${f.e}"/><path d="M50 62L45 71H55Z" fill="#2a1f3d"/><path d="M40 80Q50 86 60 80M44 82V86M50 84V88M56 82V86" stroke="#2a1f3d" stroke-width="2" fill="none" stroke-linecap="round"/>${acc}</svg>`;
+}
+const KEY="blindbox-hunter-v1";
+let S={owned:{},opens:0,pity:0};
+try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.owned)S=s}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+const $=id=>document.getElementById(id);
+function pickFigure(){
+  let r;
+  if(S.pity>=9)r="secret";
+  else{const x=Math.random()*100;r=x<5?"secret":x<30?"rare":"common"}
+  const pool=F.map((f,i)=>[f,i]).filter(p=>p[0].r===r);
+  const p=pool[Math.floor(Math.random()*pool.length)];
+  S.pity=r==="secret"?0:S.pity+1;
+  return p;
+}
+function drawStats(){
+  $("opens").textContent=S.opens;
+  $("have").textContent=Object.keys(S.owned).length;
+  const left=Math.max(10-S.pity,1);
+  $("left").textContent=left;
+  $("pbar").style.width=(S.pity/10*100)+"%";
+}
+function drawColl(){
+  $("coll").innerHTML=F.map((f,i)=>{
+    const n=S.owned[i];
+    return n?`<div class="item ${f.r}" style="background:${f.bg}">${fig(f)}${f.n} ×${n}</div>`:`<div class="item locked">${fig(f)}???</div>`;
+  }).join("");
+}
+function drawBoxes(){
+  $("grid").innerHTML="";
+  for(let i=1;i<=6;i++){
+    const b=document.createElement("button");
+    b.className="box";b.setAttribute("aria-label","Open box "+i);
+    b.innerHTML="<span>?</span>";
+    b.onclick=()=>openBox(b);
+    $("grid").appendChild(b);
+  }
+}
+function openBox(b){
+  const all=[...document.querySelectorAll(".box")];
+  all.forEach(x=>{x.disabled=true;if(x!==b)x.classList.add("dim")});
+  b.classList.add("shake");
+  setTimeout(()=>{
+    const p=pickFigure(),f=p[0],i=p[1];
+    const isNew=!S.owned[i];
+    S.owned[i]=(S.owned[i]||0)+1;S.opens++;save();
+    $("cardwrap").innerHTML=`<div class="card ${f.r}" style="background:${f.bg}">${fig(f)}<h2>${f.n}</h2><span class="tag ${f.r}">${f.r.charAt(0).toUpperCase()+f.r.slice(1)}</span></div><span class="new">${isNew?"New figure added to your collection!":"Duplicate. You now have "+S.owned[i]+"."}</span>`;
+    $("pick").style.display="none";
+    $("reveal").classList.add("on");
+    $("again").focus();
+    drawStats();drawColl();
+  },750);
+}
+$("again").onclick=()=>{
+  $("reveal").classList.remove("on");
+  $("pick").style.display="";
+  drawBoxes();
+  document.querySelector(".box").focus();
+};
+$("reset").onclick=()=>{
+  if(confirm("Reset all progress?")){
+    S={owned:{},opens:0,pity:0};save();
+    $("reveal").classList.remove("on");$("pick").style.display="";
+    drawBoxes();drawStats();drawColl();
+  }
+};
+drawBoxes();drawStats();drawColl();
+</script>
+</body>
+</html>
